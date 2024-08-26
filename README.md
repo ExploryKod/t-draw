@@ -4,6 +4,10 @@
 
 ### <p align="center"> Colladraw </p>
 
+#### Note : 
+<p>Ce repository reprend le repo d'origine du projet afin de le faire évoluer en dehors du projet de formation. Pour avoir tous l'historique des commits il faut donc se rendre sur le repo d'origine.</p>
+<a href="https://github.com/ExploryKod/colladraw-1">Je veux voir le repo d'origine</a>
+
 ## Installation
 
  0. `NPM`, `PHP`, `composer` et `mysql` sont requis
