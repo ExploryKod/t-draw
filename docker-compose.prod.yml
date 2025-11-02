@@ -1,0 +1,79 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: t-draw-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+    environment:
+      - APP_ENV=production
+    depends_on:
+      - mysql
+    networks:
+      - t-draw-network
+
+  websocket:
+    build:
+      context: .
+      dockerfile: Dockerfile.websocket
+    container_name: t-draw-websocket
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - WS_PORT=${WS_PORT:-8001}
+      - APP_URL=${APP_URL}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-${APP_URL}}
+    env_file:
+      - .env.production
+    ports:
+      - "${WS_PORT:-8001}:8001"
+    networks:
+      - t-draw-network
+    depends_on:
+      - app
+
+  nginx:
+    image: nginx:alpine
+    container_name: t-draw-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - t-draw-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: t-draw-mysql-prod
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - t-draw-network
+    ports:
+      - "127.0.0.1:3306:3306"  # Only accessible from host
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  t-draw-network:
+    driver: bridge
+

@@ -2,10 +2,17 @@ const { Server } = require("socket.io")
 
 require("dotenv").config()
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : (process.env.NODE_ENV === 'production' 
+        ? [process.env.APP_URL || 'https://yourdomain.com']
+        : ['http://localhost:8000', 'http://localhost:3000']);
+
 const io = new Server({
     cors: {
-        origin: "*", // TODO: change to production
-        methods: ["GET", "POST"]
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true
     }
 })
 

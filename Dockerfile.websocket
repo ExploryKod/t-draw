@@ -1,0 +1,20 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY websocket/ ./websocket/
+
+# Install dependencies
+RUN npm ci --production
+
+# Copy environment file
+COPY .env .env 2>/dev/null || echo "No .env file in image"
+
+# Expose WebSocket port
+EXPOSE 8001
+
+# Start WebSocket server
+CMD ["node", "websocket/index.js"]
+
