@@ -30,5 +30,5 @@ Route::get('/profile', [UserController::class, 'search'])->middleware('auth');
 Route::post('/drawings', [DrawingController::class, 'create']);
 Route::get('/drawings/{id}', [DrawingController::class, 'search']);
 
-// 404 page
-Route::get('/{path}', [NotFoundController::class, 'index']);
+// 404 page - catch all non-matching routes (must be last)
+Route::fallback([NotFoundController::class, 'index']);

@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: t-draw-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: colladraw
+      MYSQL_USER: colladraw_user
+      MYSQL_PASSWORD: colladraw_password
+    ports:
+      - "3307:3306"  # Non-standard port to avoid conflicts
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - t-draw-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: t-draw-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+      UPLOAD_LIMIT: 300M
+    ports:
+      - "8081:80"  # Non-standard port to avoid conflicts
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - t-draw-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  t-draw-network:
+    driver: bridge
+

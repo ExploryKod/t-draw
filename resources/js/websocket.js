@@ -10,7 +10,8 @@ class Websocket {
     init(canvas) {
         const clientId = Math.random().toString(16).slice(2)
 
-        const socket = io("http://localhost:8000")
+        const wsUrl = window.wsUrl || `http://localhost:${window.wsPort || 8001}`;
+        const socket = io(wsUrl)
 
         socket.on("connect", () => {
             console.info("Websocket connected")
