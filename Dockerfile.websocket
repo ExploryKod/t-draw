@@ -6,8 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY websocket/ ./websocket/
 
-# Install dependencies
-RUN npm ci --production
+# Install dependencies (including dotenv which is needed for .env loading)
+RUN npm ci --production && npm install dotenv
 
 # Copy environment files (will be overridden by env_file in docker-compose)
 COPY .env.production* ./

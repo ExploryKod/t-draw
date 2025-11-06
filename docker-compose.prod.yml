@@ -3,12 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - WWW_USER=${WWW_USER:-1000}
     container_name: t-draw-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
       - ./storage:/var/www/html/storage
       - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./.env.production:/var/www/html/.env:ro
     environment:
       - APP_ENV=production
     env_file:
@@ -32,7 +35,7 @@ services:
     env_file:
       - .env.production
     ports:
-      - "${WS_PORT:-8001}:8001"
+      - "${WS_PORT:-30002}:8001"  # WebSocket sur port 30002 par défaut (évite conflit)
     networks:
       - t-draw-network
     depends_on:
@@ -43,13 +46,15 @@ services:
     container_name: t-draw-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "30000:80"   # HTTP sur port 30000 (évite conflit avec autres services)
+      - "30001:443"  # HTTPS sur port 30001 (évite conflit avec autres services)
     volumes:
       - ./public:/var/www/html/public:ro
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/conf.d/app-ip.conf:/etc/nginx/conf.d/00-app.conf:ro
       - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    command: >
+      sh -c "rm -f /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
     depends_on:
       - app
     networks:
