@@ -4,13 +4,13 @@
     <link rel="stylesheet" href="/css/drawing.css">
     <title>Colladraw - Drawing</title>
 
-    <script src="http://localhost:{{ env('WS_PORT', 8001) }}/socket.io/socket.io.js"></script>
+    <script src="{{ config('app.url') }}/socket.io/socket.io.js"></script>
 
     <script>
         window.drawingSaved = {!! $drawingSaved ?? null !!}
             window.username = {!! Auth::user() && Auth::user()->name ? "'" . Auth::user()->name . "'" : "''" !!};
-        window.wsPort = {{ env('WS_PORT', 8001) }};
-        window.wsUrl = "http://localhost:" + window.wsPort;
+        window.wsPort = {{ config('websocket.port', 8001) }};
+        window.wsUrl = "{{ config('app.url') }}";
 
         if (window.username.length === 0) window.username = null
     </script>

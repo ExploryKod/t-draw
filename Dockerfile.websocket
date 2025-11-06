@@ -9,8 +9,8 @@ COPY websocket/ ./websocket/
 # Install dependencies
 RUN npm ci --production
 
-# Copy environment file
-COPY .env .env 2>/dev/null || echo "No .env file in image"
+# Copy environment files (will be overridden by env_file in docker-compose)
+COPY .env.production* ./
 
 # Expose WebSocket port
 EXPOSE 8001

@@ -18,8 +18,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy application files (exclude .env files, they'll be mounted)
 COPY . /var/www/html
+
+# Copy .env.production if it exists (for build-time config)
+COPY .env.production* ./
 
 # Install dependencies (production)
 RUN composer install --no-dev --optimize-autoloader --no-interaction

@@ -11,6 +11,8 @@ services:
       - ./bootstrap/cache:/var/www/html/bootstrap/cache
     environment:
       - APP_ENV=production
+    env_file:
+      - .env.production
     depends_on:
       - mysql
     networks:
