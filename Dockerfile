@@ -96,8 +96,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 # Set proper permissions for Laravel
 RUN chown -R webapp:webapp /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chmod +x /var/www/html/artisan
 
 # Clean cache
 RUN apt-get -y autoremove \
@@ -107,6 +108,7 @@ RUN apt-get -y autoremove \
 # Note: PHP-FPM will run as webapp user (configured in www.conf)
 # We keep root for the container to allow PHP-FPM to bind to port 9000
 # The PHP-FPM worker processes will run as webapp user
+# When running artisan via docker exec, it runs as root but files are owned by webapp
 
 # Expose PHP-FPM port
 EXPOSE 9000
